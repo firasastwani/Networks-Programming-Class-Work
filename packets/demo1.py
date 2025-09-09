@@ -40,6 +40,9 @@ timer_intval = 5
 cwin = 10 # window size is set to 10
 sender.base = 0
 sender.next = 0 #this points to the next packet to be transmitted.
+sender.numSend = 0
+sender.numTimeouts = 0
+
 def runSender(self):
 
     print(self.name, self.base, self.next, self.timerOn())
@@ -49,6 +52,7 @@ def runSender(self):
             packet = packets[self.next]
             self.next += 1
             print(self.name, 'sending...', packet)
+            self.numSend += 1
             self.send(receiver, packet)
 
             #start a timer, if not on
@@ -62,7 +66,11 @@ def runSender(self):
         if self.timeout:
             #timer ran out -- we need to resend the packet
             packet = packets[self.base] # send the oldest unacknowledged packet
+
+            self.numTimeouts += 1
+
             print(self.name, 're-sending...', packet)
+            self.numSend += 1
             self.send(receiver, packet)
             #restart a timer
             self.startTimer(timer_intval)
@@ -124,10 +132,17 @@ receiver.setupFSM(runReceiver)
 simulator.run()
 
 #examin all the packets being received
+print("\n=== SIMULATION RESULTS ===")
+print("Packets received:")
 for r in received:
     print(r)
 
-
+print(f"\n=== STATISTICS ===")
+print(f"Total packets sent: {sender.numSend}")
+print(f"Total timeouts: {sender.numTimeouts}")
+print(f"Number of packets: {len(packets)}")
+print(f"Average sends per packet: {sender.numSend / len(packets):.2f}")
+print(f"Timeout rate: {sender.numTimeouts / sender.numSend * 100:.1f}%")
 
 
 
