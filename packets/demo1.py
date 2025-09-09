@@ -8,6 +8,9 @@
 #Let's implement pipelining where a stream of packets can be transmitted
 #sequentially.
 
+#Demo2.py 
+# will implement a sliding window
+
 #include these 3 lines, if you are having difficulty running it on
 #VisualStudio Code debbugger
 import sys
@@ -33,10 +36,13 @@ for i in range(10):
 
 #4. We need to tell each Node what to do at each iteration inside the simulator
 timer_intval = 5
+
+cwin = 10 # window size is set to 10
+sender.base = 0
 sender.next = 0 #this points to the next packet to be transmitted.
 def runSender(self):
     if self.current == 'Ready':
-        if len(packets):
+        if self.next - self.base < cwin and self.next < len(packets):
             packet = packets[self.next % len(packets)]
             self.next += 1
             print(self.name, 'sending...', packet)
