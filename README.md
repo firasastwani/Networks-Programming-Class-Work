@@ -134,6 +134,52 @@ Demonstrates application-layer protocol over TCP:
    python httpClient.py
    ```
 
+## Functionality
+
+### Packets simulation (Go-Back-N with pipelining)
+
+- Sender maintains a sliding window with size `cwin` and two indices:
+  - `base`: first unacknowledged packet index
+  - `next`: next packet index to send
+- Receiver sends cumulative ACKs: `cack = first missing sequence number`.
+- One timer is used for the oldest unacknowledged packet; on timeout the sender retransmits that packet.
+- Random loss is applied to packets and ACKs to emulate unreliable links.
+
+### UDP Ping
+
+- Client sends timestamped pings and measures RTT per response.
+- Server randomly drops or delays replies to simulate loss/jitter.
+- Client prints min/max/average RTT and loss count.
+
+### TCP Echo/HTTP
+
+- TCP examples demonstrate connection-oriented, reliable transfer with a simple request/response.
+- HTTP server replies with fixed HTML; HTTP client performs a GET request to a public server.
+
+## Configuration (tweakable parameters)
+
+- `packets/demo1.py`
+  - `cwin`: sliding window size (default 10)
+  - `timer_intval`: retransmission timer in seconds (default 5)
+  - `loss_prob`: probability of packet or ACK loss (default 0.2)
+- `UDP/server.py`
+  - Random loss threshold (`rand > 0.7`) and variable delay (`time.sleep(rand/10)`) control drop rate and delay
+- `UDP/client.py`
+  - `n`: number of pings (default 10)
+  - `settimeout(2)`: client receive timeout in seconds
+
+## Expected Output Highlights
+
+- `packets/demo1.py`
+  - Logs like: `Sender <base> <next> <timerOn>` each step
+  - `receiving ack... Pckt: Receiver Sender [<cack>, 'Acknowledged', <seq>]`
+  - Occasional `Lost packet` / `Lost acknowledgement` due to simulated loss
+  - Completion when all packets `[0..N-1]` show up in the final list
+- `UDP/client.py`
+  - Prints RTT per ping and summary stats (min/max/avg, lost count)
+- `TCP/` and `HTTP/`
+  - Server prints received requests; client prints responses
+
 ## Educational Value
 
 This project provides hands-on experience with:
