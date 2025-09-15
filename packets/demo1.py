@@ -147,18 +147,3 @@ print(f"Timeout rate: {sender.numTimeouts / sender.numSend * 100:.1f}%")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
